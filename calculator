@@ -169,7 +169,7 @@
         <div class="main-content">
             <div class="input-group">
                 <label>USD to GBP Exchange Rate</label>
-                <input type="number" id="exchangeRate" value="0.79" step="0.0001" min="0" oninput="updateAllCalculations()">
+                <input type="number" id="exchangeRate" value="0.79" step="0.0001" min="0">
                 <p class="rate-label">Enter current exchange rate (e.g., 0.79 means 1 USD = £0.79)</p>
             </div>
         </div>
@@ -182,19 +182,19 @@
         <div class="main-content">
             <div class="input-group">
                 <label>Ocean/Air Freight (USD)</label>
-                <input type="number" id="freight" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="freight" step="0.01">
             </div>
             <div class="input-group">
                 <label>Port Handling (USD)</label>
-                <input type="number" id="portHandling" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="portHandling" step="0.01">
             </div>
             <div class="input-group">
                 <label>Container Fees (USD)</label>
-                <input type="number" id="containerFees" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="containerFees" step="0.01">
             </div>
             <div class="input-group">
                 <label>Insurance (USD)</label>
-                <input type="number" id="insurance" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="insurance" step="0.01">
             </div>
         </div>
     </div>
@@ -206,15 +206,15 @@
         <div class="main-content">
             <div class="input-group">
                 <label>Customs Duty Rates (USD)</label>
-                <input type="number" id="customsDuty" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="customsDuty" step="0.01">
             </div>
             <div class="input-group">
                 <label>Import VAT (USD)</label>
-                <input type="number" id="importVAT" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="importVAT" step="0.01">
             </div>
             <div class="input-group">
                 <label>Broker Fees (USD)</label>
-                <input type="number" id="importBrokerFees" oninput="updateAllCalculations()" step="0.01">
+                <input type="number" id="importBrokerFees" step="0.01">
             </div>
         </div>
     </div>
@@ -266,7 +266,7 @@
                 <label for="calculationName">Calculation Name</label>
                 <input type="text" id="calculationName" placeholder="Enter a name for this calculation">
             </div>
-            <button onclick="saveCalculation()">Save Calculation</button>
+            <button id="saveBtn">Save Calculation</button>
 
             <div class="saved-calculations">
                 <h3>Saved Calculations</h3>
@@ -276,115 +276,193 @@
     </div>
 
     <script>
-        function getInputValue(id) {
-            return parseFloat(document.getElementById(id)?.value) || 0;
+        // ── Fix #1: Cache DOM references once at parse time ──────────────
+        // Eliminates ~18 getElementById lookups that previously ran on every
+        // keystroke / calculation load.
+        const summaryEls = {
+            freight:          document.getElementById('summary-freight'),
+            portHandling:     document.getElementById('summary-portHandling'),
+            containerFees:    document.getElementById('summary-containerFees'),
+            insurance:        document.getElementById('summary-insurance'),
+            customsDuty:      document.getElementById('summary-customsDuty'),
+            importVAT:        document.getElementById('summary-importVAT'),
+            importBrokerFees: document.getElementById('summary-importBrokerFees'),
+            totalUSD:         document.getElementById('summary-total-cost-usd'),
+            totalGBP:         document.getElementById('summary-total-cost-gbp'),
+        };
+
+        const inputEls = {
+            exchangeRate:     document.getElementById('exchangeRate'),
+            freight:          document.getElementById('freight'),
+            portHandling:     document.getElementById('portHandling'),
+            containerFees:    document.getElementById('containerFees'),
+            insurance:        document.getElementById('insurance'),
+            customsDuty:      document.getElementById('customsDuty'),
+            importVAT:        document.getElementById('importVAT'),
+            importBrokerFees: document.getElementById('importBrokerFees'),
+        };
+
+        const calculationNameEl = document.getElementById('calculationName');
+        const savedCalculationsListEl = document.getElementById('savedCalculationsList');
+        const saveBtnEl = document.getElementById('saveBtn');
+
+        // ── Fix #6: Shared state object ──────────────────────────────────
+        // Stores the latest parsed input values so saveCalculation() can
+        // reuse them instead of re-reading from the DOM.
+        const INPUT_KEYS = ['exchangeRate', 'freight', 'portHandling', 'containerFees',
+                            'insurance', 'customsDuty', 'importVAT', 'importBrokerFees'];
+
+        const currentValues = {};
+
+        function readInputValues() {
+            for (const key of INPUT_KEYS) {
+                currentValues[key] = parseFloat(inputEls[key].value) || 0;
+            }
         }
 
+        // ── Fix #2: In-memory localStorage cache ─────────────────────────
+        // Avoids re-parsing JSON from localStorage on every load / delete /
+        // save operation. We parse once on init, then keep the array in
+        // memory and only serialise back on writes.
+        let calculationsCache = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
+
+        function persistCalculations() {
+            localStorage.setItem('savedCalculations', JSON.stringify(calculationsCache));
+        }
+
+        // ── Core calculation ─────────────────────────────────────────────
         function updateAllCalculations() {
-            const exchangeRate = getInputValue('exchangeRate') || 0.79;
+            readInputValues();
 
-            // Get individual values
-            const freight = getInputValue('freight');
-            const portHandling = getInputValue('portHandling');
-            const containerFees = getInputValue('containerFees');
-            const insurance = getInputValue('insurance');
-            const customsDuty = getInputValue('customsDuty');
-            const importVAT = getInputValue('importVAT');
-            const importBrokerFees = getInputValue('importBrokerFees');
+            const exchangeRate = currentValues.exchangeRate || 0.79;
+            const totalImportCostsUSD =
+                currentValues.freight +
+                currentValues.portHandling +
+                currentValues.containerFees +
+                currentValues.insurance +
+                currentValues.customsDuty +
+                currentValues.importVAT +
+                currentValues.importBrokerFees;
 
-            // Calculate total costs in USD
-            const totalImportCostsUSD = freight + portHandling + containerFees + insurance + customsDuty + importVAT + importBrokerFees;
-
-            // Update summary section with individual costs and totals
-            document.getElementById('summary-freight').textContent = `$${freight.toFixed(2)}`;
-            document.getElementById('summary-portHandling').textContent = `$${portHandling.toFixed(2)}`;
-            document.getElementById('summary-containerFees').textContent = `$${containerFees.toFixed(2)}`;
-            document.getElementById('summary-insurance').textContent = `$${insurance.toFixed(2)}`;
-            document.getElementById('summary-customsDuty').textContent = `$${customsDuty.toFixed(2)}`;
-            document.getElementById('summary-importVAT').textContent = `$${importVAT.toFixed(2)}`;
-            document.getElementById('summary-importBrokerFees').textContent = `$${importBrokerFees.toFixed(2)}`;
-            document.getElementById('summary-total-cost-usd').textContent = `$${totalImportCostsUSD.toFixed(2)}`;
-            document.getElementById('summary-total-cost-gbp').textContent = `£${(totalImportCostsUSD * exchangeRate).toFixed(2)}`;
+            summaryEls.freight.textContent          = `$${currentValues.freight.toFixed(2)}`;
+            summaryEls.portHandling.textContent      = `$${currentValues.portHandling.toFixed(2)}`;
+            summaryEls.containerFees.textContent     = `$${currentValues.containerFees.toFixed(2)}`;
+            summaryEls.insurance.textContent          = `$${currentValues.insurance.toFixed(2)}`;
+            summaryEls.customsDuty.textContent        = `$${currentValues.customsDuty.toFixed(2)}`;
+            summaryEls.importVAT.textContent          = `$${currentValues.importVAT.toFixed(2)}`;
+            summaryEls.importBrokerFees.textContent   = `$${currentValues.importBrokerFees.toFixed(2)}`;
+            summaryEls.totalUSD.textContent           = `$${totalImportCostsUSD.toFixed(2)}`;
+            summaryEls.totalGBP.textContent           = `£${(totalImportCostsUSD * exchangeRate).toFixed(2)}`;
         }
 
+        // ── Fix #3: Debounced input handler ──────────────────────────────
+        // Batches rapid keystrokes into a single rAF paint instead of
+        // updating the DOM synchronously on every keystroke.
+        let rafId = null;
+
+        function scheduleUpdate() {
+            if (rafId !== null) return;           // already scheduled
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
+                updateAllCalculations();
+            });
+        }
+
+        // ── Fix #5: Event delegation ─────────────────────────────────────
+        // One listener on <body> replaces 8 inline oninput attributes.
+        document.body.addEventListener('input', (e) => {
+            if (e.target.id in inputEls) {
+                scheduleUpdate();
+            }
+        });
+
+        // Wire save button via JS instead of inline onclick
+        saveBtnEl.addEventListener('click', saveCalculation);
+
+        // ── Save / Load / Delete (Fix #2 + #6 applied) ──────────────────
         function saveCalculation() {
-            const calculationName = document.getElementById('calculationName').value.trim();
+            const calculationName = calculationNameEl.value.trim();
             if (!calculationName) {
                 alert("Please enter a name for this calculation.");
                 return;
             }
 
-            const savedCalculation = {
-                name: calculationName,
-                exchangeRate: getInputValue('exchangeRate'),
-                freight: getInputValue('freight'),
-                portHandling: getInputValue('portHandling'),
-                containerFees: getInputValue('containerFees'),
-                insurance: getInputValue('insurance'),
-                customsDuty: getInputValue('customsDuty'),
-                importVAT: getInputValue('importVAT'),
-                importBrokerFees: getInputValue('importBrokerFees')
-            };
+            // Fix #6: reuse currentValues instead of re-querying each input
+            const savedCalculation = { name: calculationName };
+            for (const key of INPUT_KEYS) {
+                savedCalculation[key] = currentValues[key];
+            }
 
-            const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
-            savedCalculations.push(savedCalculation);
-            localStorage.setItem('savedCalculations', JSON.stringify(savedCalculations));
+            calculationsCache.push(savedCalculation);
+            persistCalculations();
 
-            loadSavedCalculations();
+            // Fix #4: append only the new item instead of rebuilding entire list
+            appendCalculationListItem(savedCalculation, calculationsCache.length - 1);
             alert("Calculation saved!");
         }
 
-        function loadSavedCalculations() {
-            const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
-            const savedCalculationsList = document.getElementById('savedCalculationsList');
-            savedCalculationsList.innerHTML = '';
+        // ── Fix #4: Targeted DOM helpers ─────────────────────────────────
+        // Build a single <li> for one saved calculation.
+        function createCalculationLi(calc, index) {
+            const li = document.createElement('li');
+            li.textContent = calc.name;
+            li.dataset.index = index;
 
-            savedCalculations.forEach((calc, index) => {
-                const li = document.createElement('li');
-                li.textContent = calc.name;
-                li.onclick = () => loadCalculation(index);
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'delete-btn';
+            li.appendChild(deleteButton);
 
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.className = 'delete-btn';
-                deleteButton.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteCalculation(index);
-                };
+            return li;
+        }
 
-                li.appendChild(deleteButton);
-                savedCalculationsList.appendChild(li);
+        function appendCalculationListItem(calc, index) {
+            savedCalculationsListEl.appendChild(createCalculationLi(calc, index));
+        }
+
+        // Full rebuild — only needed on initial load and after a delete
+        // (delete changes indices of all subsequent items).
+        function renderSavedCalculations() {
+            savedCalculationsListEl.innerHTML = '';
+            calculationsCache.forEach((calc, index) => {
+                savedCalculationsListEl.appendChild(createCalculationLi(calc, index));
             });
         }
 
-        function loadCalculation(index) {
-            const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
-            const calc = savedCalculations[index];
+        // Use event delegation on the list for load / delete clicks
+        savedCalculationsListEl.addEventListener('click', (e) => {
+            const li = e.target.closest('li');
+            if (!li) return;
+            const index = Number(li.dataset.index);
 
-            document.getElementById('exchangeRate').value = calc.exchangeRate;
-            document.getElementById('freight').value = calc.freight;
-            document.getElementById('portHandling').value = calc.portHandling;
-            document.getElementById('containerFees').value = calc.containerFees;
-            document.getElementById('insurance').value = calc.insurance;
-            document.getElementById('customsDuty').value = calc.customsDuty;
-            document.getElementById('importVAT').value = calc.importVAT;
-            document.getElementById('importBrokerFees').value = calc.importBrokerFees;
-            document.getElementById('calculationName').value = calc.name;
+            if (e.target.classList.contains('delete-btn')) {
+                deleteCalculation(index);
+            } else {
+                loadCalculation(index);
+            }
+        });
+
+        function loadCalculation(index) {
+            const calc = calculationsCache[index];
+
+            for (const key of INPUT_KEYS) {
+                inputEls[key].value = calc[key];
+            }
+            calculationNameEl.value = calc.name;
 
             updateAllCalculations();
             alert(`Loaded calculation: ${calc.name}`);
         }
 
         function deleteCalculation(index) {
-            const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
-            savedCalculations.splice(index, 1);
-            localStorage.setItem('savedCalculations', JSON.stringify(savedCalculations));
-            loadSavedCalculations();
+            calculationsCache.splice(index, 1);
+            persistCalculations();
+            renderSavedCalculations();     // rebuild needed (indices shift)
             alert("Calculation deleted.");
         }
 
-        // Load saved calculations on page load
-        document.addEventListener('DOMContentLoaded', loadSavedCalculations);
+        // ── Initial render ───────────────────────────────────────────────
+        renderSavedCalculations();
     </script>
 </body>
 </html>
