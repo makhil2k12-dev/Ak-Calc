@@ -150,6 +150,9 @@
             color: #3a3a3c;
             font-size: 12px;
             font-weight: 500;
+            border-radius: 16px;
+            aspect-ratio: auto;
+            padding: 14px 4px;
         }
 
         .btn.sci:hover {
