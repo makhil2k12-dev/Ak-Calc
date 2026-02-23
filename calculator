@@ -276,8 +276,33 @@
     </div>
 
     <script>
+        // Cache DOM references once at parse time to avoid repeated getElementById
+        // lookups on every keystroke (9 lookups per call × every input event).
+        const summaryEls = {
+            freight:          document.getElementById('summary-freight'),
+            portHandling:     document.getElementById('summary-portHandling'),
+            containerFees:    document.getElementById('summary-containerFees'),
+            insurance:        document.getElementById('summary-insurance'),
+            customsDuty:      document.getElementById('summary-customsDuty'),
+            importVAT:        document.getElementById('summary-importVAT'),
+            importBrokerFees: document.getElementById('summary-importBrokerFees'),
+            totalUSD:         document.getElementById('summary-total-cost-usd'),
+            totalGBP:         document.getElementById('summary-total-cost-gbp'),
+        };
+
+        const inputEls = {
+            exchangeRate:     document.getElementById('exchangeRate'),
+            freight:          document.getElementById('freight'),
+            portHandling:     document.getElementById('portHandling'),
+            containerFees:    document.getElementById('containerFees'),
+            insurance:        document.getElementById('insurance'),
+            customsDuty:      document.getElementById('customsDuty'),
+            importVAT:        document.getElementById('importVAT'),
+            importBrokerFees: document.getElementById('importBrokerFees'),
+        };
+
         function getInputValue(id) {
-            return parseFloat(document.getElementById(id)?.value) || 0;
+            return parseFloat(inputEls[id]?.value) || 0;
         }
 
         function updateAllCalculations() {
@@ -295,16 +320,16 @@
             // Calculate total costs in USD
             const totalImportCostsUSD = freight + portHandling + containerFees + insurance + customsDuty + importVAT + importBrokerFees;
 
-            // Update summary section with individual costs and totals
-            document.getElementById('summary-freight').textContent = `$${freight.toFixed(2)}`;
-            document.getElementById('summary-portHandling').textContent = `$${portHandling.toFixed(2)}`;
-            document.getElementById('summary-containerFees').textContent = `$${containerFees.toFixed(2)}`;
-            document.getElementById('summary-insurance').textContent = `$${insurance.toFixed(2)}`;
-            document.getElementById('summary-customsDuty').textContent = `$${customsDuty.toFixed(2)}`;
-            document.getElementById('summary-importVAT').textContent = `$${importVAT.toFixed(2)}`;
-            document.getElementById('summary-importBrokerFees').textContent = `$${importBrokerFees.toFixed(2)}`;
-            document.getElementById('summary-total-cost-usd').textContent = `$${totalImportCostsUSD.toFixed(2)}`;
-            document.getElementById('summary-total-cost-gbp').textContent = `£${(totalImportCostsUSD * exchangeRate).toFixed(2)}`;
+            // Update summary section using cached element references
+            summaryEls.freight.textContent          = `$${freight.toFixed(2)}`;
+            summaryEls.portHandling.textContent      = `$${portHandling.toFixed(2)}`;
+            summaryEls.containerFees.textContent     = `$${containerFees.toFixed(2)}`;
+            summaryEls.insurance.textContent          = `$${insurance.toFixed(2)}`;
+            summaryEls.customsDuty.textContent        = `$${customsDuty.toFixed(2)}`;
+            summaryEls.importVAT.textContent          = `$${importVAT.toFixed(2)}`;
+            summaryEls.importBrokerFees.textContent   = `$${importBrokerFees.toFixed(2)}`;
+            summaryEls.totalUSD.textContent           = `$${totalImportCostsUSD.toFixed(2)}`;
+            summaryEls.totalGBP.textContent           = `£${(totalImportCostsUSD * exchangeRate).toFixed(2)}`;
         }
 
         function saveCalculation() {
@@ -361,14 +386,14 @@
             const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
             const calc = savedCalculations[index];
 
-            document.getElementById('exchangeRate').value = calc.exchangeRate;
-            document.getElementById('freight').value = calc.freight;
-            document.getElementById('portHandling').value = calc.portHandling;
-            document.getElementById('containerFees').value = calc.containerFees;
-            document.getElementById('insurance').value = calc.insurance;
-            document.getElementById('customsDuty').value = calc.customsDuty;
-            document.getElementById('importVAT').value = calc.importVAT;
-            document.getElementById('importBrokerFees').value = calc.importBrokerFees;
+            inputEls.exchangeRate.value     = calc.exchangeRate;
+            inputEls.freight.value          = calc.freight;
+            inputEls.portHandling.value     = calc.portHandling;
+            inputEls.containerFees.value    = calc.containerFees;
+            inputEls.insurance.value        = calc.insurance;
+            inputEls.customsDuty.value      = calc.customsDuty;
+            inputEls.importVAT.value        = calc.importVAT;
+            inputEls.importBrokerFees.value = calc.importBrokerFees;
             document.getElementById('calculationName').value = calc.name;
 
             updateAllCalculations();
