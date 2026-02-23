@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import Cost Calculator</title>
+    <title>Scientific Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -11,458 +11,803 @@
             padding: 0;
         }
 
-        body { 
-            padding: 20px; 
-            font-family: Arial, sans-serif; 
-            margin: 0;
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .calculator-section {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto 40px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .calculator {
+            background: #1e1e2f;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 420px;
+            max-width: 95vw;
         }
 
-        .section-title {
-            grid-column: 1 / -1;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            color: #2c3e50;
+        .calculator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .main-content {
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-        }
-
-        .floating-summary {
-            position: sticky;
-            top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            height: fit-content;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-
-        .summary-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4CAF50;
-            color: #2c3e50;
-        }
-
-        .input-group {
-            margin: 15px 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
+        .calculator-title {
+            color: #a0a0c0;
+            font-size: 14px;
             font-weight: 500;
-            color: #2c3e50;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(74, 175, 80, 0.2);
-        }
-
-        .calc-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .total-row {
+        .mode-toggle {
+            background: #2a2a3d;
+            color: #4fc3f7;
+            border: 1px solid #4fc3f7;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
             font-weight: 600;
-            border-top: 2px solid #ddd;
-            margin-top: 15px;
-            padding-top: 15px;
-            color: #2c3e50;
-            font-size: 1.1em;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
+            transition: all 0.2s;
+            letter-spacing: 1px;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .mode-toggle:hover {
+            background: #4fc3f7;
+            color: #1e1e2f;
         }
 
-        .saved-calculations {
-            margin-top: 20px;
-        }
-
-        .saved-calculations-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .saved-calculations-list li {
+        .display {
+            background: #12121f;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+            min-height: 100px;
             display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            cursor: pointer;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            border: 1px solid #2a2a3d;
         }
 
-        .delete-btn {
-            color: red;
-            background: none;
+        .expression {
+            color: #6a6a8a;
+            font-size: 16px;
+            min-height: 24px;
+            word-break: break-all;
+            text-align: right;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .result {
+            color: #e0e0ff;
+            font-size: 36px;
+            font-weight: 300;
+            word-break: break-all;
+            text-align: right;
+            width: 100%;
+            transition: font-size 0.2s;
+        }
+
+        .result.small {
+            font-size: 24px;
+        }
+
+        .memory-indicator {
+            color: #4fc3f7;
+            font-size: 11px;
+            font-weight: 600;
+            min-height: 16px;
+            margin-bottom: 4px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .btn {
+            background: #2a2a3d;
+            color: #c0c0e0;
             border: none;
+            border-radius: 12px;
+            padding: 14px 8px;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        @media (max-width: 1024px) {
-            .calculator-section {
-                grid-template-columns: 1fr;
-            }
-            .floating-summary {
-                position: static;
-                margin-top: 20px;
-            }
+        .btn:hover {
+            background: #3a3a50;
+            transform: translateY(-1px);
         }
 
+        .btn:active {
+            transform: translateY(1px);
+            background: #22222f;
+        }
+
+        .btn.sci {
+            background: #1a1a2a;
+            color: #8888aa;
+            font-size: 12px;
+        }
+
+        .btn.sci:hover {
+            background: #2a2a3d;
+            color: #b0b0d0;
+        }
+
+        .btn.op {
+            background: #2d2a40;
+            color: #bb86fc;
+        }
+
+        .btn.op:hover {
+            background: #3d3a55;
+        }
+
+        .btn.num {
+            background: #2a2a3d;
+            color: #e0e0ff;
+            font-size: 18px;
+        }
+
+        .btn.num:hover {
+            background: #3a3a55;
+        }
+
+        .btn.equals {
+            background: linear-gradient(135deg, #4fc3f7, #0288d1);
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .btn.equals:hover {
+            background: linear-gradient(135deg, #6dd5fa, #0399e8);
+        }
+
+        .btn.clear {
+            background: #3d1a1a;
+            color: #ff6b6b;
+        }
+
+        .btn.clear:hover {
+            background: #4d2a2a;
+        }
+
+        .btn.memory {
+            background: #1a2a1a;
+            color: #66bb6a;
+            font-size: 11px;
+        }
+
+        .btn.memory:hover {
+            background: #2a3a2a;
+        }
+
+        .btn.wide {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 440px) {
+            .calculator {
+                padding: 16px;
+                border-radius: 16px;
+            }
+            .btn {
+                padding: 12px 6px;
+                font-size: 13px;
+            }
+            .btn.num {
+                font-size: 16px;
+            }
+            .btn.sci {
+                font-size: 11px;
+            }
+            .result {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Exchange Rate Section -->
-    <div class="calculator-section">
-        <h2 class="section-title">Exchange Rate Settings</h2>
-        <div class="main-content">
-            <div class="input-group">
-                <label>USD to GBP Exchange Rate</label>
-                <input type="number" id="exchangeRate" value="0.79" step="0.0001" min="0">
-                <p class="rate-label">Enter current exchange rate (e.g., 0.79 means 1 USD = £0.79)</p>
-            </div>
+    <div class="calculator">
+        <div class="calculator-header">
+            <span class="calculator-title">Scientific Calculator</span>
+            <button class="mode-toggle" id="modeToggle" title="Toggle Degrees/Radians">DEG</button>
         </div>
-    </div>
 
-    <!-- Shipping Costs Section -->
-    <div class="calculator-section">
-        <h2 class="section-title">Shipping & Import Costs</h2>
-        
-        <div class="main-content">
-            <div class="input-group">
-                <label>Ocean/Air Freight (USD)</label>
-                <input type="number" id="freight" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Port Handling (USD)</label>
-                <input type="number" id="portHandling" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Container Fees (USD)</label>
-                <input type="number" id="containerFees" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Insurance (USD)</label>
-                <input type="number" id="insurance" step="0.01">
-            </div>
+        <div class="display">
+            <div class="memory-indicator" id="memoryIndicator"></div>
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
         </div>
-    </div>
 
-    <!-- Import Duties & Taxes Section -->
-    <div class="calculator-section">
-        <h2 class="section-title">Import Duties & Taxes</h2>
-        
-        <div class="main-content">
-            <div class="input-group">
-                <label>Customs Duty Rates (USD)</label>
-                <input type="number" id="customsDuty" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Import VAT (USD)</label>
-                <input type="number" id="importVAT" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Broker Fees (USD)</label>
-                <input type="number" id="importBrokerFees" step="0.01">
-            </div>
-        </div>
-    </div>
+        <div class="btn-grid">
+            <!-- Row 1: Memory -->
+            <button class="btn memory" data-action="mc">MC</button>
+            <button class="btn memory" data-action="mr">MR</button>
+            <button class="btn memory" data-action="m+">M+</button>
+            <button class="btn memory" data-action="m-">M&minus;</button>
+            <button class="btn clear" data-action="clear">AC</button>
 
-    <!-- Summary Section with Save Calculation -->
-    <div class="calculator-section">
-        <h2 class="section-title">Summary of Import Costs</h2>
-        
-        <div class="main-content">
-            <div class="calc-row">
-                <span>Freight (USD):</span>
-                <span id="summary-freight">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Port Handling (USD):</span>
-                <span id="summary-portHandling">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Container Fees (USD):</span>
-                <span id="summary-containerFees">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Insurance (USD):</span>
-                <span id="summary-insurance">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Customs Duty (USD):</span>
-                <span id="summary-customsDuty">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Import VAT (USD):</span>
-                <span id="summary-importVAT">$0.00</span>
-            </div>
-            <div class="calc-row">
-                <span>Broker Fees (USD):</span>
-                <span id="summary-importBrokerFees">$0.00</span>
-            </div>
-            <div class="calc-row total-row">
-                <span>Total Import Costs (USD):</span>
-                <span id="summary-total-cost-usd">$0.00</span>
-            </div>
-            <div class="calc-row total-row">
-                <span>Total Import Costs (GBP):</span>
-                <span id="summary-total-cost-gbp">£0.00</span>
-            </div>
+            <!-- Row 2: Scientific -->
+            <button class="btn sci" data-action="sin">sin</button>
+            <button class="btn sci" data-action="cos">cos</button>
+            <button class="btn sci" data-action="tan">tan</button>
+            <button class="btn sci" data-action="log">log</button>
+            <button class="btn sci" data-action="ln">ln</button>
 
-            <!-- Save Calculation Feature -->
-            <div class="input-group">
-                <label for="calculationName">Calculation Name</label>
-                <input type="text" id="calculationName" placeholder="Enter a name for this calculation">
-            </div>
-            <button id="saveBtn">Save Calculation</button>
+            <!-- Row 3: Scientific -->
+            <button class="btn sci" data-action="asin">sin<sup>&minus;1</sup></button>
+            <button class="btn sci" data-action="acos">cos<sup>&minus;1</sup></button>
+            <button class="btn sci" data-action="atan">tan<sup>&minus;1</sup></button>
+            <button class="btn sci" data-action="sqrt">&radic;</button>
+            <button class="btn sci" data-action="cbrt"><sup>3</sup>&radic;</button>
 
-            <div class="saved-calculations">
-                <h3>Saved Calculations</h3>
-                <ul id="savedCalculationsList" class="saved-calculations-list"></ul>
-            </div>
+            <!-- Row 4: Scientific -->
+            <button class="btn sci" data-action="square">x&sup2;</button>
+            <button class="btn sci" data-action="cube">x&sup3;</button>
+            <button class="btn sci" data-action="power">x<sup>y</sup></button>
+            <button class="btn sci" data-action="factorial">n!</button>
+            <button class="btn sci" data-action="reciprocal">1/x</button>
+
+            <!-- Row 5: Constants & Misc -->
+            <button class="btn sci" data-action="pi">&pi;</button>
+            <button class="btn sci" data-action="e">e</button>
+            <button class="btn sci" data-action="abs">|x|</button>
+            <button class="btn op" data-action="open-paren">(</button>
+            <button class="btn op" data-action="close-paren">)</button>
+
+            <!-- Row 6: 7 8 9 / backspace -->
+            <button class="btn num" data-action="digit" data-value="7">7</button>
+            <button class="btn num" data-action="digit" data-value="8">8</button>
+            <button class="btn num" data-action="digit" data-value="9">9</button>
+            <button class="btn op" data-action="operator" data-value="/">&divide;</button>
+            <button class="btn clear" data-action="backspace">&larr;</button>
+
+            <!-- Row 7: 4 5 6 * % -->
+            <button class="btn num" data-action="digit" data-value="4">4</button>
+            <button class="btn num" data-action="digit" data-value="5">5</button>
+            <button class="btn num" data-action="digit" data-value="6">6</button>
+            <button class="btn op" data-action="operator" data-value="*">&times;</button>
+            <button class="btn sci" data-action="percent">%</button>
+
+            <!-- Row 8: 1 2 3 - negate -->
+            <button class="btn num" data-action="digit" data-value="1">1</button>
+            <button class="btn num" data-action="digit" data-value="2">2</button>
+            <button class="btn num" data-action="digit" data-value="3">3</button>
+            <button class="btn op" data-action="operator" data-value="-">&minus;</button>
+            <button class="btn sci" data-action="negate">&plusmn;</button>
+
+            <!-- Row 9: 0 . = + -->
+            <button class="btn num wide" data-action="digit" data-value="0">0</button>
+            <button class="btn num" data-action="decimal">.</button>
+            <button class="btn equals" data-action="equals">=</button>
+            <button class="btn op" data-action="operator" data-value="+">+</button>
         </div>
     </div>
 
     <script>
-        // ── Fix #1: Cache DOM references once at parse time ──────────────
-        // Eliminates ~18 getElementById lookups that previously ran on every
-        // keystroke / calculation load.
-        const summaryEls = {
-            freight:          document.getElementById('summary-freight'),
-            portHandling:     document.getElementById('summary-portHandling'),
-            containerFees:    document.getElementById('summary-containerFees'),
-            insurance:        document.getElementById('summary-insurance'),
-            customsDuty:      document.getElementById('summary-customsDuty'),
-            importVAT:        document.getElementById('summary-importVAT'),
-            importBrokerFees: document.getElementById('summary-importBrokerFees'),
-            totalUSD:         document.getElementById('summary-total-cost-usd'),
-            totalGBP:         document.getElementById('summary-total-cost-gbp'),
-        };
+        // ── State ────────────────────────────────────────────────────────
+        let expression = '';
+        let currentInput = '0';
+        let result = null;
+        let memory = 0;
+        let useDegrees = true;
+        let justEvaluated = false;
 
-        const inputEls = {
-            exchangeRate:     document.getElementById('exchangeRate'),
-            freight:          document.getElementById('freight'),
-            portHandling:     document.getElementById('portHandling'),
-            containerFees:    document.getElementById('containerFees'),
-            insurance:        document.getElementById('insurance'),
-            customsDuty:      document.getElementById('customsDuty'),
-            importVAT:        document.getElementById('importVAT'),
-            importBrokerFees: document.getElementById('importBrokerFees'),
-        };
+        // ── DOM refs ─────────────────────────────────────────────────────
+        const expressionEl = document.getElementById('expression');
+        const resultEl = document.getElementById('result');
+        const memoryIndicatorEl = document.getElementById('memoryIndicator');
+        const modeToggleEl = document.getElementById('modeToggle');
 
-        const calculationNameEl = document.getElementById('calculationName');
-        const savedCalculationsListEl = document.getElementById('savedCalculationsList');
-        const saveBtnEl = document.getElementById('saveBtn');
+        // ── Helpers ──────────────────────────────────────────────────────
+        function toRad(deg) { return deg * Math.PI / 180; }
+        function toDeg(rad) { return rad * 180 / Math.PI; }
 
-        // ── Fix #6: Shared state object ──────────────────────────────────
-        // Stores the latest parsed input values so saveCalculation() can
-        // reuse them instead of re-reading from the DOM.
-        const INPUT_KEYS = ['exchangeRate', 'freight', 'portHandling', 'containerFees',
-                            'insurance', 'customsDuty', 'importVAT', 'importBrokerFees'];
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            if (n > 170) return Infinity;
+            if (!Number.isInteger(n)) return gamma(n + 1);
+            let res = 1;
+            for (let i = 2; i <= n; i++) res *= i;
+            return res;
+        }
 
-        const currentValues = {};
+        function gamma(z) {
+            if (z < 0.5) {
+                return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+            }
+            z -= 1;
+            const g = 7;
+            const c = [
+                0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                771.32342877765313, -176.61502916214059, 12.507343278686905,
+                -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+            ];
+            let x = c[0];
+            for (let i = 1; i < g + 2; i++) {
+                x += c[i] / (z + i);
+            }
+            const t = z + g + 0.5;
+            return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+        }
 
-        function readInputValues() {
-            for (const key of INPUT_KEYS) {
-                currentValues[key] = parseFloat(inputEls[key].value) || 0;
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '0';
+            if (typeof num === 'string') return num;
+            if (isNaN(num)) return 'Error';
+            if (!isFinite(num)) return num > 0 ? 'Infinity' : '-Infinity';
+            if (Math.abs(num) > 1e15 || (Math.abs(num) < 1e-10 && num !== 0)) {
+                return num.toExponential(8);
+            }
+            const str = parseFloat(num.toPrecision(12)).toString();
+            return str;
+        }
+
+        function updateDisplay() {
+            expressionEl.textContent = expression;
+            const display = justEvaluated && result !== null ? formatNumber(result) : currentInput;
+            resultEl.textContent = display;
+            resultEl.classList.toggle('small', display.length > 12);
+            memoryIndicatorEl.textContent = memory !== 0 ? 'M' : '';
+        }
+
+        function getNumericValue() {
+            if (justEvaluated && result !== null) return result;
+            return parseFloat(currentInput) || 0;
+        }
+
+        function setResult(val) {
+            result = val;
+            currentInput = formatNumber(val);
+            justEvaluated = true;
+            updateDisplay();
+        }
+
+        // ── Scientific functions ─────────────────────────────────────────
+        function applyScientificFn(fnName) {
+            const val = getNumericValue();
+            let res;
+
+            switch (fnName) {
+                case 'sin':
+                    res = useDegrees ? Math.sin(toRad(val)) : Math.sin(val);
+                    expression = `sin(${formatNumber(val)})`;
+                    break;
+                case 'cos':
+                    res = useDegrees ? Math.cos(toRad(val)) : Math.cos(val);
+                    expression = `cos(${formatNumber(val)})`;
+                    break;
+                case 'tan':
+                    res = useDegrees ? Math.tan(toRad(val)) : Math.tan(val);
+                    expression = `tan(${formatNumber(val)})`;
+                    break;
+                case 'asin':
+                    res = Math.asin(val);
+                    if (useDegrees) res = toDeg(res);
+                    expression = `sin\u207B\u00B9(${formatNumber(val)})`;
+                    break;
+                case 'acos':
+                    res = Math.acos(val);
+                    if (useDegrees) res = toDeg(res);
+                    expression = `cos\u207B\u00B9(${formatNumber(val)})`;
+                    break;
+                case 'atan':
+                    res = Math.atan(val);
+                    if (useDegrees) res = toDeg(res);
+                    expression = `tan\u207B\u00B9(${formatNumber(val)})`;
+                    break;
+                case 'log':
+                    res = Math.log10(val);
+                    expression = `log(${formatNumber(val)})`;
+                    break;
+                case 'ln':
+                    res = Math.log(val);
+                    expression = `ln(${formatNumber(val)})`;
+                    break;
+                case 'sqrt':
+                    res = Math.sqrt(val);
+                    expression = `\u221A(${formatNumber(val)})`;
+                    break;
+                case 'cbrt':
+                    res = Math.cbrt(val);
+                    expression = `\u221B(${formatNumber(val)})`;
+                    break;
+                case 'square':
+                    res = val * val;
+                    expression = `(${formatNumber(val)})\u00B2`;
+                    break;
+                case 'cube':
+                    res = val * val * val;
+                    expression = `(${formatNumber(val)})\u00B3`;
+                    break;
+                case 'factorial':
+                    res = factorial(val);
+                    expression = `${formatNumber(val)}!`;
+                    break;
+                case 'reciprocal':
+                    res = val === 0 ? NaN : 1 / val;
+                    expression = `1/(${formatNumber(val)})`;
+                    break;
+                case 'abs':
+                    res = Math.abs(val);
+                    expression = `|${formatNumber(val)}|`;
+                    break;
+                case 'percent':
+                    res = val / 100;
+                    expression = `${formatNumber(val)}%`;
+                    break;
+                default:
+                    return;
+            }
+
+            if (Math.abs(res) < 1e-14 && Math.abs(res) > 0) res = 0;
+            setResult(res);
+        }
+
+        // ── Arithmetic state ─────────────────────────────────────────────
+        let pendingOperator = null;
+        let accumulator = null;
+
+        function clearAll() {
+            expression = '';
+            currentInput = '0';
+            result = null;
+            justEvaluated = false;
+            pendingOperator = null;
+            accumulator = null;
+            updateDisplay();
+        }
+
+        function inputDigit(d) {
+            if (justEvaluated) {
+                currentInput = d;
+                expression = '';
+                justEvaluated = false;
+            } else if (currentInput === '0' && d !== '.') {
+                currentInput = d;
+            } else {
+                currentInput += d;
+            }
+            updateDisplay();
+        }
+
+        function inputDecimal() {
+            if (justEvaluated) {
+                currentInput = '0.';
+                expression = '';
+                justEvaluated = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function inputOperator(op) {
+            const val = getNumericValue();
+
+            if (accumulator === null) {
+                accumulator = val;
+            } else if (pendingOperator && !justEvaluated) {
+                accumulator = compute(accumulator, pendingOperator, val);
+            } else if (pendingOperator && justEvaluated) {
+                accumulator = val;
+            }
+
+            const opSymbol = { '+': ' + ', '-': ' \u2212 ', '*': ' \u00D7 ', '/': ' \u00F7 ' }[op] || ` ${op} `;
+
+            if (justEvaluated) {
+                expression = formatNumber(val) + opSymbol;
+            } else {
+                expression += formatNumber(val) + opSymbol;
+            }
+
+            pendingOperator = op;
+            justEvaluated = false;
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function compute(a, op, b) {
+            switch (op) {
+                case '+': return a + b;
+                case '-': return a - b;
+                case '*': return a * b;
+                case '/': return b === 0 ? NaN : a / b;
+                case '**': return Math.pow(a, b);
+                default: return b;
             }
         }
 
-        // ── Fix #2: In-memory localStorage cache ─────────────────────────
-        // Avoids re-parsing JSON from localStorage on every load / delete /
-        // save operation. We parse once on init, then keep the array in
-        // memory and only serialise back on writes.
-        let calculationsCache = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
-
-        function persistCalculations() {
-            localStorage.setItem('savedCalculations', JSON.stringify(calculationsCache));
-        }
-
-        // ── Core calculation ─────────────────────────────────────────────
-        function updateAllCalculations() {
-            readInputValues();
-
-            const exchangeRate = currentValues.exchangeRate || 0.79;
-            const totalImportCostsUSD =
-                currentValues.freight +
-                currentValues.portHandling +
-                currentValues.containerFees +
-                currentValues.insurance +
-                currentValues.customsDuty +
-                currentValues.importVAT +
-                currentValues.importBrokerFees;
-
-            summaryEls.freight.textContent          = `$${currentValues.freight.toFixed(2)}`;
-            summaryEls.portHandling.textContent      = `$${currentValues.portHandling.toFixed(2)}`;
-            summaryEls.containerFees.textContent     = `$${currentValues.containerFees.toFixed(2)}`;
-            summaryEls.insurance.textContent          = `$${currentValues.insurance.toFixed(2)}`;
-            summaryEls.customsDuty.textContent        = `$${currentValues.customsDuty.toFixed(2)}`;
-            summaryEls.importVAT.textContent          = `$${currentValues.importVAT.toFixed(2)}`;
-            summaryEls.importBrokerFees.textContent   = `$${currentValues.importBrokerFees.toFixed(2)}`;
-            summaryEls.totalUSD.textContent           = `$${totalImportCostsUSD.toFixed(2)}`;
-            summaryEls.totalGBP.textContent           = `£${(totalImportCostsUSD * exchangeRate).toFixed(2)}`;
-        }
-
-        // ── Fix #3: Debounced input handler ──────────────────────────────
-        // Batches rapid keystrokes into a single rAF paint instead of
-        // updating the DOM synchronously on every keystroke.
-        let rafId = null;
-
-        function scheduleUpdate() {
-            if (rafId !== null) return;           // already scheduled
-            rafId = requestAnimationFrame(() => {
-                rafId = null;
-                updateAllCalculations();
-            });
-        }
-
-        // ── Fix #5: Event delegation ─────────────────────────────────────
-        // One listener on <body> replaces 8 inline oninput attributes.
-        document.body.addEventListener('input', (e) => {
-            if (e.target.id in inputEls) {
-                scheduleUpdate();
-            }
-        });
-
-        // Wire save button via JS instead of inline onclick
-        saveBtnEl.addEventListener('click', saveCalculation);
-
-        // ── Save / Load / Delete (Fix #2 + #6 applied) ──────────────────
-        function saveCalculation() {
-            const calculationName = calculationNameEl.value.trim();
-            if (!calculationName) {
-                alert("Please enter a name for this calculation.");
+        function evaluate() {
+            if (pendingOperator === null) {
+                result = getNumericValue();
+                expression = formatNumber(result) + ' =';
+                justEvaluated = true;
+                updateDisplay();
                 return;
             }
 
-            // Fix #6: reuse currentValues instead of re-querying each input
-            const savedCalculation = { name: calculationName };
-            for (const key of INPUT_KEYS) {
-                savedCalculation[key] = currentValues[key];
-            }
+            const val = getNumericValue();
+            const res = compute(accumulator, pendingOperator, val);
 
-            calculationsCache.push(savedCalculation);
-            persistCalculations();
-
-            // Fix #4: append only the new item instead of rebuilding entire list
-            appendCalculationListItem(savedCalculation, calculationsCache.length - 1);
-            alert("Calculation saved!");
+            expression += formatNumber(val) + ' =';
+            result = res;
+            currentInput = formatNumber(res);
+            justEvaluated = true;
+            pendingOperator = null;
+            accumulator = null;
+            updateDisplay();
         }
 
-        // ── Fix #4: Targeted DOM helpers ─────────────────────────────────
-        // Build a single <li> for one saved calculation.
-        function createCalculationLi(calc, index) {
-            const li = document.createElement('li');
-            li.textContent = calc.name;
-            li.dataset.index = index;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.className = 'delete-btn';
-            li.appendChild(deleteButton);
-
-            return li;
+        function inputPower() {
+            const val = getNumericValue();
+            accumulator = val;
+            pendingOperator = '**';
+            expression = formatNumber(val) + ' ^ ';
+            justEvaluated = false;
+            currentInput = '0';
+            updateDisplay();
         }
 
-        function appendCalculationListItem(calc, index) {
-            savedCalculationsListEl.appendChild(createCalculationLi(calc, index));
-        }
-
-        // Full rebuild — only needed on initial load and after a delete
-        // (delete changes indices of all subsequent items).
-        function renderSavedCalculations() {
-            savedCalculationsListEl.innerHTML = '';
-            calculationsCache.forEach((calc, index) => {
-                savedCalculationsListEl.appendChild(createCalculationLi(calc, index));
-            });
-        }
-
-        // Use event delegation on the list for load / delete clicks
-        savedCalculationsListEl.addEventListener('click', (e) => {
-            const li = e.target.closest('li');
-            if (!li) return;
-            const index = Number(li.dataset.index);
-
-            if (e.target.classList.contains('delete-btn')) {
-                deleteCalculation(index);
+        function handleBackspace() {
+            if (justEvaluated) return;
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
             } else {
-                loadCalculation(index);
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        function handleNegate() {
+            if (justEvaluated && result !== null) {
+                result = -result;
+                currentInput = formatNumber(result);
+            } else {
+                const val = parseFloat(currentInput);
+                if (val !== 0) {
+                    currentInput = formatNumber(-val);
+                }
+            }
+            updateDisplay();
+        }
+
+        // ── Parentheses support ──────────────────────────────────────────
+        let parenDepth = 0;
+        let parenExpr = '';
+        let inParenMode = false;
+
+        function handleOpenParen() {
+            if (justEvaluated) {
+                expression = '';
+                currentInput = '0';
+                justEvaluated = false;
+                accumulator = null;
+                pendingOperator = null;
+            }
+            parenDepth++;
+            if (!inParenMode) {
+                inParenMode = true;
+                parenExpr = '';
+            }
+            parenExpr += '(';
+            expression += '(';
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function handleCloseParen() {
+            if (parenDepth <= 0) return;
+            parenDepth--;
+            parenExpr += currentInput + ')';
+            expression += currentInput + ')';
+
+            if (parenDepth === 0 && inParenMode) {
+                try {
+                    const safeExpr = parenExpr.replace(/[^0-9+\-*/().e ]/g, '');
+                    const res = Function('"use strict"; return (' + safeExpr + ')')();
+                    currentInput = formatNumber(res);
+                    result = res;
+                } catch (err) {
+                    currentInput = 'Error';
+                }
+                inParenMode = false;
+                parenExpr = '';
+            }
+            updateDisplay();
+        }
+
+        // ── Event handling ───────────────────────────────────────────────
+        document.querySelector('.btn-grid').addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn');
+            if (!btn) return;
+
+            var action = btn.dataset.action;
+            var value = btn.dataset.value;
+
+            switch (action) {
+                case 'digit':
+                    if (inParenMode) {
+                        if (currentInput === '0') currentInput = value;
+                        else currentInput += value;
+                        updateDisplay();
+                    } else {
+                        inputDigit(value);
+                    }
+                    break;
+
+                case 'decimal':
+                    if (inParenMode) {
+                        if (!currentInput.includes('.')) currentInput += '.';
+                        updateDisplay();
+                    } else {
+                        inputDecimal();
+                    }
+                    break;
+
+                case 'operator':
+                    if (inParenMode) {
+                        parenExpr += currentInput + value;
+                        expression += currentInput + ({ '+': '+', '-': '\u2212', '*': '\u00D7', '/': '\u00F7' }[value] || value);
+                        currentInput = '0';
+                        updateDisplay();
+                    } else {
+                        inputOperator(value);
+                    }
+                    break;
+
+                case 'equals':
+                    evaluate();
+                    break;
+
+                case 'clear':
+                    parenDepth = 0;
+                    inParenMode = false;
+                    parenExpr = '';
+                    clearAll();
+                    break;
+
+                case 'backspace':
+                    handleBackspace();
+                    break;
+
+                case 'negate':
+                    handleNegate();
+                    break;
+
+                case 'pi':
+                    currentInput = Math.PI.toString();
+                    if (justEvaluated) { expression = ''; justEvaluated = false; }
+                    updateDisplay();
+                    break;
+
+                case 'e':
+                    currentInput = Math.E.toString();
+                    if (justEvaluated) { expression = ''; justEvaluated = false; }
+                    updateDisplay();
+                    break;
+
+                case 'power':
+                    inputPower();
+                    break;
+
+                case 'open-paren':
+                    handleOpenParen();
+                    break;
+
+                case 'close-paren':
+                    handleCloseParen();
+                    break;
+
+                case 'mc':
+                    memory = 0;
+                    updateDisplay();
+                    break;
+
+                case 'mr':
+                    currentInput = formatNumber(memory);
+                    if (justEvaluated) { expression = ''; justEvaluated = false; }
+                    updateDisplay();
+                    break;
+
+                case 'm+':
+                    memory += getNumericValue();
+                    updateDisplay();
+                    break;
+
+                case 'm-':
+                    memory -= getNumericValue();
+                    updateDisplay();
+                    break;
+
+                case 'sin':
+                case 'cos':
+                case 'tan':
+                case 'asin':
+                case 'acos':
+                case 'atan':
+                case 'log':
+                case 'ln':
+                case 'sqrt':
+                case 'cbrt':
+                case 'square':
+                case 'cube':
+                case 'factorial':
+                case 'reciprocal':
+                case 'abs':
+                case 'percent':
+                    applyScientificFn(action);
+                    break;
             }
         });
 
-        function loadCalculation(index) {
-            const calc = calculationsCache[index];
+        // ── DEG / RAD toggle ─────────────────────────────────────────────
+        modeToggleEl.addEventListener('click', function () {
+            useDegrees = !useDegrees;
+            modeToggleEl.textContent = useDegrees ? 'DEG' : 'RAD';
+        });
 
-            for (const key of INPUT_KEYS) {
-                inputEls[key].value = calc[key];
+        // ── Keyboard support ─────────────────────────────────────────────
+        document.addEventListener('keydown', function (e) {
+            var key = e.key;
+
+            if (key >= '0' && key <= '9') {
+                e.preventDefault();
+                if (inParenMode) {
+                    if (currentInput === '0') currentInput = key;
+                    else currentInput += key;
+                    updateDisplay();
+                } else {
+                    inputDigit(key);
+                }
+            } else if (key === '.') {
+                e.preventDefault();
+                inputDecimal();
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                e.preventDefault();
+                inputOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                e.preventDefault();
+                evaluate();
+            } else if (key === 'Backspace') {
+                e.preventDefault();
+                handleBackspace();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                e.preventDefault();
+                parenDepth = 0;
+                inParenMode = false;
+                parenExpr = '';
+                clearAll();
+            } else if (key === '(') {
+                e.preventDefault();
+                handleOpenParen();
+            } else if (key === ')') {
+                e.preventDefault();
+                handleCloseParen();
             }
-            calculationNameEl.value = calc.name;
+        });
 
-            updateAllCalculations();
-            alert(`Loaded calculation: ${calc.name}`);
-        }
-
-        function deleteCalculation(index) {
-            calculationsCache.splice(index, 1);
-            persistCalculations();
-            renderSavedCalculations();     // rebuild needed (indices shift)
-            alert("Calculation deleted.");
-        }
-
-        // ── Initial render ───────────────────────────────────────────────
-        renderSavedCalculations();
+        // ── Initial display ──────────────────────────────────────────────
+        updateDisplay();
     </script>
 </body>
 </html>
