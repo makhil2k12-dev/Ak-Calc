@@ -16,16 +16,17 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f2f2f7;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         .calculator {
-            background: #1e1e2f;
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            width: 420px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            width: 400px;
             max-width: 95vw;
         }
 
@@ -33,74 +34,76 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            padding: 0 4px;
         }
 
         .calculator-title {
-            color: #a0a0c0;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 1px;
+            color: #8e8e93;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
         .mode-toggle {
-            background: #2a2a3d;
-            color: #4fc3f7;
-            border: 1px solid #4fc3f7;
-            border-radius: 20px;
-            padding: 4px 14px;
+            background: #f2f2f7;
+            color: #007aff;
+            border: none;
+            border-radius: 14px;
+            padding: 5px 14px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
+            transition: background 0.2s;
+            letter-spacing: 0.5px;
         }
 
         .mode-toggle:hover {
-            background: #4fc3f7;
-            color: #1e1e2f;
+            background: #e5e5ea;
         }
 
         .display {
-            background: #12121f;
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 18px;
-            min-height: 100px;
+            background: #f9f9f9;
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin-bottom: 16px;
+            min-height: 96px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            border: 1px solid #2a2a3d;
+            border: none;
         }
 
         .expression {
-            color: #6a6a8a;
-            font-size: 16px;
-            min-height: 24px;
+            color: #8e8e93;
+            font-size: 15px;
+            font-weight: 400;
+            min-height: 22px;
             word-break: break-all;
             text-align: right;
             width: 100%;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .result {
-            color: #e0e0ff;
-            font-size: 36px;
+            color: #1c1c1e;
+            font-size: 40px;
             font-weight: 300;
             word-break: break-all;
             text-align: right;
             width: 100%;
             transition: font-size 0.2s;
+            letter-spacing: -0.5px;
         }
 
         .result.small {
-            font-size: 24px;
+            font-size: 26px;
         }
 
         .memory-indicator {
-            color: #4fc3f7;
+            color: #007aff;
             font-size: 11px;
             font-weight: 600;
             min-height: 16px;
@@ -112,114 +115,145 @@
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn {
-            background: #2a2a3d;
-            color: #c0c0e0;
+            background: #e5e5ea;
+            color: #1c1c1e;
             border: none;
-            border-radius: 12px;
-            padding: 14px 8px;
-            font-size: 14px;
+            border-radius: 50%;
+            width: 100%;
+            aspect-ratio: 1;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: background 0.15s ease, transform 0.1s ease;
             user-select: none;
             -webkit-user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn:hover {
-            background: #3a3a50;
-            transform: translateY(-1px);
+            background: #d1d1d6;
         }
 
         .btn:active {
-            transform: translateY(1px);
-            background: #22222f;
+            transform: scale(0.93);
+            background: #c7c7cc;
         }
 
         .btn.sci {
-            background: #1a1a2a;
-            color: #8888aa;
+            background: #f2f2f7;
+            color: #3a3a3c;
             font-size: 12px;
+            font-weight: 500;
         }
 
         .btn.sci:hover {
-            background: #2a2a3d;
-            color: #b0b0d0;
+            background: #e5e5ea;
         }
 
         .btn.op {
-            background: #2d2a40;
-            color: #bb86fc;
+            background: #ff9500;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 500;
         }
 
         .btn.op:hover {
-            background: #3d3a55;
+            background: #e08600;
+        }
+
+        .btn.op:active {
+            background: #cc7a00;
+            transform: scale(0.93);
         }
 
         .btn.num {
-            background: #2a2a3d;
-            color: #e0e0ff;
-            font-size: 18px;
+            background: #ffffff;
+            color: #1c1c1e;
+            font-size: 20px;
+            font-weight: 400;
+            border: 1px solid #e5e5ea;
         }
 
         .btn.num:hover {
-            background: #3a3a55;
+            background: #f2f2f7;
+        }
+
+        .btn.num:active {
+            background: #e5e5ea;
+            transform: scale(0.93);
         }
 
         .btn.equals {
-            background: linear-gradient(135deg, #4fc3f7, #0288d1);
-            color: #fff;
-            font-size: 20px;
-            font-weight: 600;
+            background: #007aff;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 500;
         }
 
         .btn.equals:hover {
-            background: linear-gradient(135deg, #6dd5fa, #0399e8);
+            background: #006ee6;
+        }
+
+        .btn.equals:active {
+            background: #005cbf;
+            transform: scale(0.93);
         }
 
         .btn.clear {
-            background: #3d1a1a;
-            color: #ff6b6b;
+            background: #ff3b30;
+            color: #ffffff;
+            font-weight: 500;
         }
 
         .btn.clear:hover {
-            background: #4d2a2a;
+            background: #e6352b;
+        }
+
+        .btn.clear:active {
+            background: #cc2f26;
+            transform: scale(0.93);
         }
 
         .btn.memory {
-            background: #1a2a1a;
-            color: #66bb6a;
+            background: #f2f2f7;
+            color: #34c759;
             font-size: 11px;
+            font-weight: 600;
         }
 
         .btn.memory:hover {
-            background: #2a3a2a;
+            background: #e5e5ea;
         }
 
         .btn.wide {
             grid-column: span 2;
+            border-radius: 28px;
+            aspect-ratio: auto;
+            padding: 16px 8px;
         }
 
         @media (max-width: 440px) {
             .calculator {
-                padding: 16px;
-                border-radius: 16px;
+                padding: 20px 14px 14px;
+                border-radius: 20px;
             }
             .btn {
-                padding: 12px 6px;
                 font-size: 13px;
             }
             .btn.num {
-                font-size: 16px;
+                font-size: 17px;
             }
             .btn.sci {
                 font-size: 11px;
             }
             .result {
-                font-size: 28px;
+                font-size: 32px;
             }
         }
     </style>
